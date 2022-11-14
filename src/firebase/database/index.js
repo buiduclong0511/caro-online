@@ -1,28 +1,53 @@
-import { getDatabase, onValue, ref, set, get, child } from 'firebase/database';
+import { query } from 'firebase/database';
+import { addDoc, collection, doc, getDoc, getDocs, getFirestore, serverTimestamp, updateDoc } from 'firebase/firestore';
 
-const db = {
-    write(collection, id, data) {
-        const db = getDatabase();
-        return set(ref(db, `${collection}/${id}`), data);
-    },
-    read(path) {
-        const db = getDatabase();
+class Db {
+    async store(collectionName, data) {
+        const db = getFirestore();
+        const _data = {
+            ...data,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+        };
+        return await addDoc(collection(db, collectionName), _data);
+    }
 
-        return new Promise((res, rej) => {
-            get(child(ref(db), path))
-                .then((snapshot) => res(snapshot.val()))
-                .catch((err) => rej(err));
-        });
-    },
-    onChanged(path, observerCb = () => {}, cancelCb = () => {}) {
-        const db = getDatabase();
+    async show(collectionName, id) {
+        const db = getFirestore();
 
-        return onValue(
-            ref(db, path),
-            (snapshot) => observerCb(snapshot.val()),
-            (err) => cancelCb(err),
+        const _doc = await getDoc(doc(db, collectionName, id));
+
+        return {
+            ..._doc.data(),
+            id: _doc.id,
+        };
+    }
+
+    async index(collectionName, ...queryConstraints) {
+        const db = getFirestore();
+
+        const _queryConstraints = [collection(db, collectionName), ...queryConstraints];
+        const _doc = await getDocs(query(..._queryConstraints));
+
+        const data = [];
+        _doc.forEach((doc) =>
+            data.push({
+                ...doc.data(),
+                id: doc.id,
+            }),
         );
-    },
-};
 
-export default db;
+        return data;
+    }
+
+    async updateById(collectionName, id, data) {
+        const db = getFirestore();
+        const updateRef = doc(db, collectionName, id);
+
+        const res = await updateDoc(updateRef, data);
+
+        return res;
+    }
+}
+
+export default new Db();
