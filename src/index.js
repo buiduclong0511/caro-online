@@ -1,12 +1,11 @@
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
+import { AuthProvider } from '~/contexts/providers';
+import '~/firebase';
 import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-
-import { AuthProvider } from '~/contexts/providers';
-import '~/firebase';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

@@ -1,4 +1,6 @@
-import { Routes, Route } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import routes from '~/routes';
 
@@ -11,6 +13,7 @@ function App() {
                     return <Route key={index} path={route.path} element={<Element />} />;
                 })}
             </Routes>
+            <ToastContainer />
         </div>
     );
 }

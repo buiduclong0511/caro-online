@@ -28,3 +28,8 @@ export const signInWithGoogle = () => {
             .catch((err) => rej(err));
     });
 };
+
+export const signOut = () => {
+    const auth = getAuth();
+    auth.signOut();
+};
