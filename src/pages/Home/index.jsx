@@ -1,15 +1,10 @@
-import { useDispatch } from 'react-redux';
-import { createRoom } from '~/redux/slices';
+import { signOut } from '~/firebase/authentication';
 import { cx } from '~/util';
 
 function Home() {
-    const dispatch = useDispatch();
-    const handleCreateRoom = () => {
-        dispatch(createRoom());
-    };
     return (
         <h1 className={cx('text-center')}>
-            <button onClick={handleCreateRoom}>Create room</button>
+            <button onClick={signOut}>Logout</button>
         </h1>
     );
 }
