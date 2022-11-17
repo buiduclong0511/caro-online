@@ -1,5 +1,10 @@
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { GoogleAuthProvider } from 'firebase/auth';
+import {
+    createUserWithEmailAndPassword,
+    getAuth,
+    GoogleAuthProvider,
+    signInWithEmailAndPassword,
+    signInWithPopup,
+} from 'firebase/auth';
 
 export const signInWithEmail = (email, password) => {
     return new Promise((res, rej) => {
