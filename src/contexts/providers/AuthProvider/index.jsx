@@ -18,12 +18,12 @@ function AuthProvider({ children }) {
         const auth = getAuth();
         auth.onAuthStateChanged(
             (user) => {
-                storage.set('user', user);
-                setCurrentUser(user);
                 setIsLoading(false);
                 if (!user) {
                     navigate(paths.login, { replace: true });
+                    return;
                 }
+                setCurrentUser(user);
             },
             () => {
                 storage.clear();
