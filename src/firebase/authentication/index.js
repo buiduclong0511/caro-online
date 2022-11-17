@@ -6,6 +6,9 @@ import {
     signInWithPopup,
 } from 'firebase/auth';
 
+import { USERS_PATH } from '~/constants';
+import realtimeDb from '../realtimeDatabase';
+
 export const signInWithEmail = (email, password) => {
     return new Promise((res, rej) => {
         const auth = getAuth();
@@ -19,7 +22,18 @@ export const signUpWithEmail = (email, password) => {
     return new Promise((res, rej) => {
         const auth = getAuth();
         createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => res(userCredential.user))
+            .then((userCredential) => {
+                const user = userCredential.user;
+                realtimeDb
+                    .write(USERS_PATH, user.uid, {
+                        uid: user.uid,
+                        email: user.email,
+                        photoURL: user.photoURL,
+                    })
+                    .then(() => {
+                        res(user);
+                    });
+            })
             .catch((err) => rej(err));
     });
 };
@@ -29,7 +43,18 @@ export const signInWithGoogle = () => {
         const auth = getAuth();
         const provider = new GoogleAuthProvider();
         signInWithPopup(auth, provider)
-            .then((result) => res(result.user))
+            .then((result) => {
+                const user = result.user;
+                realtimeDb
+                    .write(USERS_PATH, user.uid, {
+                        uid: user.uid,
+                        email: user.email,
+                        photoURL: user.photoURL,
+                    })
+                    .then(() => {
+                        res(user);
+                    });
+            })
             .catch((err) => rej(err));
     });
 };
