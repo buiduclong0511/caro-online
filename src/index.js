@@ -1,8 +1,10 @@
 import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
+import { PersistGate } from 'redux-persist/integration/react';
 
-import { AuthProvider } from '~/contexts/providers';
 import '~/firebase';
+import store, { persistor } from '~/redux';
 import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
@@ -10,9 +12,11 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <BrowserRouter>
-        <AuthProvider>
-            <App />
-        </AuthProvider>
+        <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+                <App />
+            </PersistGate>
+        </Provider>
     </BrowserRouter>,
 );
 
