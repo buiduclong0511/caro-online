@@ -1,6 +1,6 @@
 import { cx } from '~/util';
 
-function Input({ label = '', icon: Icon, fullWidth = false, error = '', ...props }) {
+function Input({ label = '', icon: Icon, fullWidth = false, error = '', onChange, ...props }) {
     return (
         <div
             className={cx('relative border border-solid border-white rounded-[4px] mb-[32px]', {
@@ -18,6 +18,7 @@ function Input({ label = '', icon: Icon, fullWidth = false, error = '', ...props
                     'pl-[12px]': !Icon,
                 })}
                 placeholder={label}
+                onChange={onChange}
             />
             {!!error && <p className={cx('absolute top-full pt-[2px] text-[14px] text-red-600')}>{error}</p>}
         </div>
