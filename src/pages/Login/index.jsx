@@ -1,19 +1,21 @@
 import { useFormik } from 'formik';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
 
 import { Button, Input } from '~/components';
 import { ArrowSmallRight, EnvelopIcon, LockClosedIcon } from '~/components/icons';
-import { signUpWithEmail } from '~/firebase/authentication';
+import { signInWithEmail, signInWithGoogle, signUpWithEmail } from '~/firebase/authentication';
 import { cx } from '~/util';
-
-const REGEX_EMAIL = /^\s*[a-zA-Z0-9.]+@\w+(\.\w+)+\s*$/g;
 
 function Login() {
     const [isLogin, setIsLogin] = useState(true);
+    const navigate = useNavigate();
 
     const toggleLogin = () => {
         setIsLogin(!isLogin);
+        formik.resetForm();
     };
 
     const formik = useFormik({
@@ -23,17 +25,31 @@ function Login() {
             confirmPassword: '',
         },
         validationSchema: Yup.object({
-            email: Yup.string()
-                .matches(REGEX_EMAIL, 'Email không hợp lệ')
-                .max(50, 'Tối đa 50 ký tự')
-                .required('Vui lòng nhập email của bạn'),
-            password: Yup.string().min(8, 'Mật khẩu ít nhất 8 ký tự').required('Vui lòng nhập mật khẩu'),
+            email: Yup.string().required('Vui lòng nhập email của bạn').email('Email không hợp lệ'),
+            password: Yup.string().required('Vui lòng nhập mật khẩu').min(8, 'Mật khẩu ít nhất 8 ký tự'),
             confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Mật khẩu không trùng khớp'),
         }),
-        onSubmit: (values, { setSubmitting, resetForm }) => {
-            signUpWithEmail(values.email, values.password);
+        onSubmit: async (values, { setSubmitting, resetForm }) => {
+            try {
+                if (isLogin) {
+                    await signInWithEmail(values.email, values.password);
+                    navigate('/');
+                } else {
+                    await signUpWithEmail(values.email, values.password);
+                    navigate('/');
+                }
+            } catch {
+                toast.error('Có lỗi xảy ra. Vui lòng thử lại sau ít phút');
+            } finally {
+                setSubmitting(false);
+            }
         },
     });
+
+    const handleLoginWithGoogle = async () => {
+        await signInWithGoogle();
+        navigate('/');
+    };
 
     return (
         <div
@@ -83,7 +99,11 @@ function Login() {
                     </span>
                 </div>
                 <div className={cx('w-full bg-gray-300 h-[1px] my-[24px]')}></div>
-                <Button fullWith className={cx('flex items-center justify-center gap-[8px]')}>
+                <Button
+                    fullWith
+                    className={cx('flex items-center justify-center gap-[8px]')}
+                    onClick={handleLoginWithGoogle}
+                >
                     <img className={cx('w-[16px]')} src="/images/google-logo.png" alt="" />
                     Sign in with Google
                 </Button>
