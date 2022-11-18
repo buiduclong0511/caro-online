@@ -50,7 +50,6 @@ function Login() {
             await signInWithGoogle();
             navigate('/', { replace: true });
         } catch (error) {
-            console.log(error);
             toast.error('Có lỗi xảy ra. Vui lòng thử lại sau ít phút');
         }
     };
