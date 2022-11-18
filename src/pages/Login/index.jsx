@@ -13,11 +13,6 @@ function Login() {
     const [isLogin, setIsLogin] = useState(true);
     const navigate = useNavigate();
 
-    const toggleLogin = () => {
-        setIsLogin(!isLogin);
-        formik.resetForm();
-    };
-
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -29,15 +24,14 @@ function Login() {
             password: Yup.string().required('Vui lòng nhập mật khẩu').min(8, 'Mật khẩu ít nhất 8 ký tự'),
             confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Mật khẩu không trùng khớp'),
         }),
-        onSubmit: async (values, { setSubmitting, resetForm }) => {
+        onSubmit: async (values, { setSubmitting }) => {
             try {
                 if (isLogin) {
                     await signInWithEmail(values.email, values.password);
-                    navigate('/');
                 } else {
                     await signUpWithEmail(values.email, values.password);
-                    navigate('/');
                 }
+                navigate('/', { replace: true });
             } catch {
                 toast.error('Có lỗi xảy ra. Vui lòng thử lại sau ít phút');
             } finally {
@@ -46,9 +40,19 @@ function Login() {
         },
     });
 
+    const toggleLogin = () => {
+        setIsLogin(!isLogin);
+        formik.resetForm();
+    };
+
     const handleLoginWithGoogle = async () => {
-        await signInWithGoogle();
-        navigate('/');
+        try {
+            await signInWithGoogle();
+            navigate('/', { replace: true });
+        } catch (error) {
+            console.log(error);
+            toast.error('Có lỗi xảy ra. Vui lòng thử lại sau ít phút');
+        }
     };
 
     return (
@@ -57,7 +61,7 @@ function Login() {
                 'text-center bg-login-bg bg-no-repeat bg-cover bg-[#2148C0] min-h-screen flex justify-center items-center',
             )}
         >
-            <form className={cx('w-[300px]')} onSubmit={formik.handleSubmit}>
+            <div className={cx('w-[300px]')}>
                 <Input
                     label="Email"
                     icon={EnvelopIcon}
@@ -89,7 +93,7 @@ function Login() {
                         onBlur={formik.handleBlur}
                     />
                 )}
-                <Button fullWith type="submit" disabled={formik.isSubmitting}>
+                <Button fullWith disabled={formik.isSubmitting} onClick={formik.handleSubmit}>
                     {isLogin ? 'Login' : 'Register'}
                 </Button>
                 <div className={cx('text-[16px] leading-[20px] mt-[16px] text-white flex justify-between')}>
@@ -107,7 +111,7 @@ function Login() {
                     <img className={cx('w-[16px]')} src="/images/google-logo.png" alt="" />
                     Sign in with Google
                 </Button>
-            </form>
+            </div>
         </div>
     );
 }
