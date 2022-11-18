@@ -40,6 +40,12 @@ function Login() {
         },
     });
 
+    const handlePressEnter = (e) => {
+        if (e.key === 'Enter') {
+            formik.handleSubmit();
+        }
+    };
+
     const toggleLogin = () => {
         setIsLogin(!isLogin);
         formik.resetForm();
@@ -69,6 +75,7 @@ function Login() {
                     error={formik.touched.email && formik.errors.email}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
+                    onKeyDown={handlePressEnter}
                 />
                 <Input
                     label="Password"
@@ -79,6 +86,7 @@ function Login() {
                     error={formik.touched.password && formik.errors.password}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
+                    onKeyDown={handlePressEnter}
                 />
                 {!isLogin && (
                     <Input
@@ -90,6 +98,7 @@ function Login() {
                         error={formik.touched.confirmPassword && formik.errors.confirmPassword}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
+                        onKeyDown={handlePressEnter}
                     />
                 )}
                 <Button type="button" fullWith disabled={formik.isSubmitting} onClick={formik.handleSubmit}>
