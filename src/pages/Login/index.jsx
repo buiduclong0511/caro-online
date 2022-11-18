@@ -92,7 +92,7 @@ function Login() {
                         onBlur={formik.handleBlur}
                     />
                 )}
-                <Button fullWith disabled={formik.isSubmitting} onClick={formik.handleSubmit}>
+                <Button type="button" fullWith disabled={formik.isSubmitting} onClick={formik.handleSubmit}>
                     {isLogin ? 'Login' : 'Register'}
                 </Button>
                 <div className={cx('text-[16px] leading-[20px] mt-[16px] text-white flex justify-between')}>
