@@ -1,20 +1,17 @@
 import { useFormik } from 'formik';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
 
 import { Button, Input } from '~/components';
 import { ArrowSmallRight, EnvelopIcon, LockClosedIcon } from '~/components/icons';
-import { signUpWithEmail } from '~/firebase/authentication';
+import { signInWithEmail, signInWithGoogle, signUpWithEmail } from '~/firebase/authentication';
 import { cx } from '~/util';
-
-const REGEX_EMAIL = /^\s*[a-zA-Z0-9.]+@\w+(\.\w+)+\s*$/g;
 
 function Login() {
     const [isLogin, setIsLogin] = useState(true);
-
-    const toggleLogin = () => {
-        setIsLogin(!isLogin);
-    };
+    const navigate = useNavigate();
 
     const formik = useFormik({
         initialValues: {
@@ -23,17 +20,39 @@ function Login() {
             confirmPassword: '',
         },
         validationSchema: Yup.object({
-            email: Yup.string()
-                .matches(REGEX_EMAIL, 'Email không hợp lệ')
-                .max(50, 'Tối đa 50 ký tự')
-                .required('Vui lòng nhập email của bạn'),
-            password: Yup.string().min(8, 'Mật khẩu ít nhất 8 ký tự').required('Vui lòng nhập mật khẩu'),
+            email: Yup.string().required('Vui lòng nhập email của bạn').email('Email không hợp lệ'),
+            password: Yup.string().required('Vui lòng nhập mật khẩu').min(8, 'Mật khẩu ít nhất 8 ký tự'),
             confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Mật khẩu không trùng khớp'),
         }),
-        onSubmit: (values, { setSubmitting, resetForm }) => {
-            signUpWithEmail(values.email, values.password);
+        onSubmit: async (values, { setSubmitting }) => {
+            try {
+                if (isLogin) {
+                    await signInWithEmail(values.email, values.password);
+                } else {
+                    await signUpWithEmail(values.email, values.password);
+                }
+                navigate('/', { replace: true });
+            } catch {
+                toast.error('Có lỗi xảy ra. Vui lòng thử lại sau ít phút');
+            } finally {
+                setSubmitting(false);
+            }
         },
     });
+
+    const toggleLogin = () => {
+        setIsLogin(!isLogin);
+        formik.resetForm();
+    };
+
+    const handleLoginWithGoogle = async () => {
+        try {
+            await signInWithGoogle();
+            navigate('/', { replace: true });
+        } catch (error) {
+            toast.error('Có lỗi xảy ra. Vui lòng thử lại sau ít phút');
+        }
+    };
 
     return (
         <div
@@ -41,7 +60,7 @@ function Login() {
                 'text-center bg-login-bg bg-no-repeat bg-cover bg-[#2148C0] min-h-screen flex justify-center items-center',
             )}
         >
-            <form className={cx('w-[300px]')} onSubmit={formik.handleSubmit}>
+            <div className={cx('w-[300px]')}>
                 <Input
                     label="Email"
                     icon={EnvelopIcon}
@@ -73,7 +92,7 @@ function Login() {
                         onBlur={formik.handleBlur}
                     />
                 )}
-                <Button fullWith type="submit" disabled={formik.isSubmitting}>
+                <Button fullWith disabled={formik.isSubmitting} onClick={formik.handleSubmit}>
                     {isLogin ? 'Login' : 'Register'}
                 </Button>
                 <div className={cx('text-[16px] leading-[20px] mt-[16px] text-white flex justify-between')}>
@@ -83,11 +102,15 @@ function Login() {
                     </span>
                 </div>
                 <div className={cx('w-full bg-gray-300 h-[1px] my-[24px]')}></div>
-                <Button fullWith className={cx('flex items-center justify-center gap-[8px]')}>
+                <Button
+                    fullWith
+                    className={cx('flex items-center justify-center gap-[8px]')}
+                    onClick={handleLoginWithGoogle}
+                >
                     <img className={cx('w-[16px]')} src="/images/google-logo.png" alt="" />
                     Sign in with Google
                 </Button>
-            </form>
+            </div>
         </div>
     );
 }
