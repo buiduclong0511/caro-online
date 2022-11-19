@@ -18,6 +18,9 @@ module.exports = {
             borderColor: {
                 'level-border': '#b7eb8f',
             },
+            textColor: {
+                'active-color': '#1677FF',
+            },
         },
     },
     plugins: [],
