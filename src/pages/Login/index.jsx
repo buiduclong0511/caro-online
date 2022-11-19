@@ -1,13 +1,13 @@
 import { useFormik } from 'formik';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
-import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
+import * as Yup from 'yup';
 
 import { Button, Input } from '~/components';
 import { ArrowSmallRight, EnvelopIcon, LockClosedIcon } from '~/components/icons';
+import { ENTER_KEY } from '~/constants';
 import { signInWithEmail, signInWithGoogle, signUpWithEmail } from '~/firebase/authentication';
-import { cx } from '~/util';
+import { cx, handleFirebaseError } from '~/util';
 
 function Login() {
     const [isLogin, setIsLogin] = useState(true);
@@ -20,9 +20,9 @@ function Login() {
             confirmPassword: '',
         },
         validationSchema: Yup.object({
-            email: Yup.string().required('Vui lòng nhập email của bạn').email('Email không hợp lệ'),
-            password: Yup.string().required('Vui lòng nhập mật khẩu').min(8, 'Mật khẩu ít nhất 8 ký tự'),
-            confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Mật khẩu không trùng khớp'),
+            email: Yup.string().required('Email is required').email('Email is invalid'),
+            password: Yup.string().required('Password is required').min(8, 'At least 8 characters'),
+            confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Password not matched'),
         }),
         onSubmit: async (values, { setSubmitting }) => {
             try {
@@ -32,8 +32,8 @@ function Login() {
                     await signUpWithEmail(values.email, values.password);
                 }
                 navigate('/', { replace: true });
-            } catch {
-                toast.error('Có lỗi xảy ra. Vui lòng thử lại sau ít phút');
+            } catch (err) {
+                handleFirebaseError(err);
             } finally {
                 setSubmitting(false);
             }
@@ -41,7 +41,7 @@ function Login() {
     });
 
     const handlePressEnter = (e) => {
-        if (e.key === 'Enter') {
+        if (e.keyCode === ENTER_KEY) {
             formik.handleSubmit();
         }
     };
@@ -55,8 +55,8 @@ function Login() {
         try {
             await signInWithGoogle();
             navigate('/', { replace: true });
-        } catch (error) {
-            toast.error('Có lỗi xảy ra. Vui lòng thử lại sau ít phút');
+        } catch (err) {
+            handleFirebaseError(err);
         }
     };
 
