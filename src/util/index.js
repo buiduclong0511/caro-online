@@ -1,3 +1,5 @@
+import { toast } from 'react-toastify';
+
 export const cx = (...args) => {
     return args
         .map((arg) => {
@@ -49,3 +51,16 @@ export const storage = (() => {
         },
     };
 })();
+
+export const handleFirebaseError = (err) => {
+    switch (err.code) {
+        case 'auth/user-not-found':
+            toast.error('User not found');
+            break;
+        case 'auth/wrong-password':
+            toast.error('Wrong password');
+            break;
+        default:
+            toast.error('Something went wrong. Please try again later');
+    }
+};
