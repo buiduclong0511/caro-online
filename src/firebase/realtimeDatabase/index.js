@@ -1,11 +1,11 @@
-import { child, get, getDatabase, onValue, ref, remove, serverTimestamp, set } from 'firebase/database';
+import { child, get, getDatabase, onValue, ref, remove, serverTimestamp, set, update } from 'firebase/database';
 
 const db = {
     write(collection, id, data = {}) {
         const db = getDatabase();
         return set(ref(db, `${collection}/${id}`), {
             ...data,
-            updatedAt: serverTimestamp(),
+            createdAt: serverTimestamp(),
         });
     },
     read(path) {
@@ -15,6 +15,13 @@ const db = {
             get(child(ref(db), path))
                 .then((snapshot) => res(snapshot.val()))
                 .catch((err) => rej(err));
+        });
+    },
+    update(path, newData) {
+        const db = getDatabase();
+
+        return update(ref(db), {
+            [path]: newData,
         });
     },
     remove(path) {

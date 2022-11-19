@@ -39,17 +39,7 @@ export const outRoom = createAsyncThunk('rooms/outRoom', async (data, { rejectWi
                             [curr]: curr,
                         };
                     }, {});
-                const audiences = room.audiences.reduce((prev, curr) => {
-                    return {
-                        ...prev,
-                        [curr]: [curr],
-                    };
-                }, {});
-                db.write(ROOMS_PATH, id, {
-                    ...room,
-                    members: newMembers,
-                    audiences,
-                });
+                db.update(`${ROOMS_PATH}/${id}/members`, newMembers);
             } else if (room.audiences.includes(uid)) {
                 const newAudiences = room.audiences
                     .filter((audience) => audience !== uid)
@@ -59,17 +49,7 @@ export const outRoom = createAsyncThunk('rooms/outRoom', async (data, { rejectWi
                             [curr]: curr,
                         };
                     }, {});
-                const members = room.members.reduce((prev, curr) => {
-                    return {
-                        ...prev,
-                        [curr]: [curr],
-                    };
-                }, {});
-                db.write(ROOMS_PATH, id, {
-                    ...room,
-                    audiences: newAudiences,
-                    members,
-                });
+                db.update(`${ROOMS_PATH}/${id}/audiences`, newAudiences);
             }
         });
     } catch (err) {}
