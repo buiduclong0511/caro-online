@@ -13,7 +13,7 @@ function Tabs({ children, defaultActive = 0 }) {
                         key={`tab-${index}`}
                         onClick={() => setActiveIndex(index)}
                         className={cx('w-[100%] text-center transition-[300ms] font-semibold', {
-                            'text-active-color': activeIndex === index,
+                            'text-tab-active-color': activeIndex === index,
                             'bg-[#fff]': activeIndex === index,
                             'rounded-t-[10px]': activeIndex === index,
                         })}

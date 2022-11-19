@@ -14,12 +14,10 @@ module.exports = {
             },
             colors: {
                 'level-color': '#389e0d',
+                'tab-active-color': '#1677FF',
             },
             borderColor: {
                 'level-border': '#b7eb8f',
-            },
-            textColor: {
-                'active-color': '#1677FF',
             },
         },
     },
