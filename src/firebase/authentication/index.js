@@ -7,7 +7,7 @@ import {
 } from 'firebase/auth';
 
 import { USERS_PATH } from '~/constants';
-import realtimeDb from '../realtimeDatabase';
+import db from '../realtimeDatabase';
 
 export const signInWithEmail = (email, password) => {
     return new Promise((res, rej) => {
@@ -24,15 +24,17 @@ export const signUpWithEmail = (email, password) => {
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
-                realtimeDb
-                    .write(USERS_PATH, user.uid, {
-                        uid: user.uid,
-                        email: user.email,
-                        photoURL: user.photoURL,
-                    })
-                    .then(() => {
-                        res(user);
-                    });
+                db.write(USERS_PATH, user.uid, {
+                    uid: user.uid,
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    scores: 0,
+                    online: false,
+                    level: 1,
+                    exp: 0,
+                }).then(() => {
+                    res(user);
+                });
             })
             .catch((err) => rej(err));
     });
@@ -45,15 +47,17 @@ export const signInWithGoogle = () => {
         signInWithPopup(auth, provider)
             .then((result) => {
                 const user = result.user;
-                realtimeDb
-                    .write(USERS_PATH, user.uid, {
-                        uid: user.uid,
-                        email: user.email,
-                        photoURL: user.photoURL,
-                    })
-                    .then(() => {
-                        res(user);
-                    });
+                db.write(USERS_PATH, user.uid, {
+                    uid: user.uid,
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    scores: 0,
+                    online: false,
+                    level: 0,
+                    exp: 0,
+                }).then(() => {
+                    res(user);
+                });
             })
             .catch((err) => rej(err));
     });

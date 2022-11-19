@@ -1,9 +1,12 @@
-import { getDatabase, onValue, ref, set, get, child } from 'firebase/database';
+import { child, get, getDatabase, onValue, ref, remove, serverTimestamp, set, update } from 'firebase/database';
 
-const realtimeDb = {
-    write(collection, id, data) {
+const db = {
+    write(collection, id, data = {}) {
         const db = getDatabase();
-        return set(ref(db, `${collection}/${id}`), data);
+        return set(ref(db, `${collection}/${id}`), {
+            ...data,
+            createdAt: serverTimestamp(),
+        });
     },
     read(path) {
         const db = getDatabase();
@@ -13,6 +16,18 @@ const realtimeDb = {
                 .then((snapshot) => res(snapshot.val()))
                 .catch((err) => rej(err));
         });
+    },
+    update(path, newData) {
+        const db = getDatabase();
+
+        return update(ref(db), {
+            [path]: newData,
+        });
+    },
+    remove(path) {
+        const db = getDatabase();
+
+        return remove(ref(db, path));
     },
     onChanged(path, observerCb = () => {}, cancelCb = () => {}) {
         const db = getDatabase();
@@ -25,4 +40,4 @@ const realtimeDb = {
     },
 };
 
-export default realtimeDb;
+export default db;

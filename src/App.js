@@ -7,9 +7,7 @@ import { ListenDbFirebase } from '~/modules';
 import routes from '~/routes';
 
 function App() {
-    const state = useSelector((state) => {
-        return state;
-    });
+    const state = useSelector((state) => state);
     console.log('state', state);
     return (
         <div className="app">
