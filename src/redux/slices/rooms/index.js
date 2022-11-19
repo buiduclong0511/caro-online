@@ -9,7 +9,8 @@ const initialState = [];
 export const createRoom = createAsyncThunk('rooms/createRoom', async (data, { rejectWithValue, getState }) => {
     try {
         const masterUid = getState().auth.currentUser.uid;
-        await db.write(ROOMS_PATH, uuid(), {
+        const roomId = uuid();
+        await db.write(ROOMS_PATH, roomId, {
             masterUid,
             members: {
                 [masterUid]: masterUid,
@@ -17,7 +18,7 @@ export const createRoom = createAsyncThunk('rooms/createRoom', async (data, { re
             audiences: {},
         });
 
-        return true;
+        return roomId;
     } catch (err) {
         return rejectWithValue(err);
     }
