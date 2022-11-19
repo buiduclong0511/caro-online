@@ -127,10 +127,7 @@ function ListenDbFirebase() {
             isMarkedOnline.current = true;
             const _currentUser = users.find((user) => user.uid === currentUser.uid);
             if (_currentUser && !_currentUser.online) {
-                db.write(USERS_PATH, _currentUser.uid, {
-                    ..._currentUser,
-                    online: true,
-                });
+                db.update(`${USERS_PATH}/${_currentUser.uid}/online`, true);
             }
         }
     }, [currentUser, users]);
@@ -141,10 +138,7 @@ function ListenDbFirebase() {
             if (currentUser) {
                 const _currentUser = users.find((user) => user.uid === currentUser.uid);
                 if (_currentUser) {
-                    db.write(USERS_PATH, _currentUser.uid, {
-                        ..._currentUser,
-                        online: false,
-                    });
+                    db.update(`${USERS_PATH}/${_currentUser.uid}/online`, false);
                 }
             }
         };
