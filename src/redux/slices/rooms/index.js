@@ -9,16 +9,23 @@ const initialState = [];
 export const createRoom = createAsyncThunk('rooms/createRoom', async (data, { rejectWithValue, getState }) => {
     try {
         const masterUid = getState().auth.currentUser.uid;
-        const roomId = uuid();
-        await db.write(ROOMS_PATH, roomId, {
-            masterUid,
-            members: {
-                [masterUid]: masterUid,
-            },
-            audiences: {},
-        });
+        const currentRoom = getState().rooms.find(
+            (room) => room.members.includes(masterUid) || room.audiences.includes(masterUid),
+        );
+        if (!currentRoom) {
+            const roomId = uuid();
+            await db.write(ROOMS_PATH, roomId, {
+                masterUid,
+                members: {
+                    [masterUid]: masterUid,
+                },
+                audiences: {},
+            });
 
-        return roomId;
+            return roomId;
+        }
+
+        return currentRoom.id;
     } catch (err) {
         return rejectWithValue(err);
     }
