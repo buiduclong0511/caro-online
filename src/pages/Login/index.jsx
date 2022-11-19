@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 
 import { Button, Input } from '~/components';
-import { ArrowSmallRight, EnvelopIcon, LockClosedIcon } from '~/components/icons';
+import { ArrowSmallRightIcon, EnvelopIcon, LockClosedIcon } from '~/components/icons';
 import { ENTER_KEY } from '~/constants';
 import { signInWithEmail, signInWithGoogle, signUpWithEmail } from '~/firebase/authentication';
 import { cx, handleFirebaseError } from '~/util';
@@ -107,7 +107,7 @@ function Login() {
                 <div className={cx('text-[16px] leading-[20px] mt-[16px] text-white flex justify-between')}>
                     <span className={cx('cursor-pointer')}>Forgot password?</span>
                     <span className={cx('cursor-pointer flex gap-[4px]')} onClick={toggleLogin}>
-                        {isLogin ? 'Register' : 'Login'} <ArrowSmallRight className={cx('w-[20px]')} />
+                        {isLogin ? 'Register' : 'Login'} <ArrowSmallRightIcon className={cx('w-[20px]')} />
                     </span>
                 </div>
                 <div className={cx('w-full bg-gray-300 h-[1px] my-[24px]')}></div>

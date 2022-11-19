@@ -1,5 +1,5 @@
 import { cx } from '~/util';
-import { AddFriend } from '../icons';
+import { AddFriendIcon } from '../icons';
 
 function Sidebar() {
     return (
@@ -19,9 +19,9 @@ function Sidebar() {
             </div>
             <div className={cx('h-[100%] mt-3 flex flex-col flex-1 gap-3 border-[2px] p-[8px] rounded-lg')}>
                 <div className={cx('flex justify-between w-[100%] h-[30px]')}>
-                    <h3 className={cx('text-[16px] uppercase')}>Hành động</h3>
+                    <h3 className={cx('text-[16px] uppercase font-bold')}>Bạn bè</h3>
                     <button>
-                        <AddFriend className={cx('w-[16px]')} />
+                        <AddFriendIcon className={cx('w-[16px]')} />
                     </button>
                 </div>
                 <div className={cx('flex justify-between pr-2')}>

@@ -34,7 +34,7 @@ export const LockClosedIcon = ({ className = '' }) => (
     </svg>
 );
 
-export const ArrowSmallRight = ({ className = '' }) => (
+export const ArrowSmallRightIcon = ({ className = '' }) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -47,7 +47,7 @@ export const ArrowSmallRight = ({ className = '' }) => (
     </svg>
 );
 
-export const AddFriend = ({ className = '' }) => (
+export const AddFriendIcon = ({ className = '' }) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
