@@ -11,6 +11,10 @@ module.exports = {
             },
             backgroundImage: {
                 'login-bg': 'url(/public/images/login_bg.svg)',
+                'room-bg': 'url(/public/images/caro-background.jpg)',
+            },
+            backgroundSize: {
+                '50%': '25%',
             },
             colors: {
                 'level-color': '#389e0d',

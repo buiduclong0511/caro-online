@@ -1,8 +1,9 @@
-import { Home, Login } from '~/pages';
+import { Home, Login, Room } from '~/pages';
 
 export const paths = {
     home: '/',
     login: '/login',
+    room: '/room/:id',
 };
 
 const routes = [
@@ -14,6 +15,11 @@ const routes = [
     {
         path: paths.login,
         element: Login,
+        isPrivate: false,
+    },
+    {
+        path: paths.room,
+        element: Room,
         isPrivate: false,
     },
 ];
