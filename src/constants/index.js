@@ -11,3 +11,5 @@ export const USER_KEY = 'user';
 
 // Room status
 export const ROOM_WAITING = 'waiting';
+export const ROOM_READY = 'ready';
+export const ROOM_STARTING = 'starting';

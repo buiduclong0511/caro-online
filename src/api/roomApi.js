@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import { ROOMS_PATH } from '~/constants';
+import { ROOMS_PATH, ROOM_READY, ROOM_STARTING } from '~/constants';
 import db from '~/firebase/realtimeDatabase';
 import store from '~/redux';
 
@@ -27,6 +27,47 @@ const roomApi = {
 
                 return roomId;
             }
+        } catch (err) {
+            return err;
+        }
+    },
+    async join(id, role = 'member') {
+        try {
+            const state = store.getState();
+            const uid = state.auth.currentUser.uid;
+
+            const room = state.rooms.find((room) => room.id === id);
+
+            if (role === 'member') {
+                let newMembers = [...room.members];
+                newMembers.push(uid);
+                newMembers = newMembers.reduce((prev, curr) => {
+                    return {
+                        ...prev,
+                        [curr]: curr,
+                    };
+                }, {});
+                await db.update(`${ROOMS_PATH}/${room.id}/members`, newMembers);
+                if (Object.keys(newMembers).length === 2) {
+                    await db.update(`${ROOMS_PATH}/${room.id}/status`, ROOM_READY);
+                }
+                return true;
+            }
+        } catch (err) {
+            return err;
+        }
+    },
+    async start() {
+        try {
+            const state = store.getState();
+            const uid = state.auth.currentUser.uid;
+            const rooms = state.rooms;
+            const currentRoom = rooms.find((room) => room.masterUid === uid);
+            if (currentRoom && currentRoom.status === ROOM_READY) {
+                await db.update(`${ROOMS_PATH}/${currentRoom.id}/status`, ROOM_STARTING);
+                return true;
+            }
+            return true;
         } catch (err) {
             return err;
         }

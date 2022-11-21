@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { generatePath, useNavigate } from 'react-router-dom';
 
-import { ROOM_WAITING } from '~/constants';
+import { ROOM_STARTING, ROOM_WAITING } from '~/constants';
 import { paths } from '~/routes';
 
 function RoomMiddleware({ children }) {
@@ -18,7 +18,9 @@ function RoomMiddleware({ children }) {
             );
 
             if (currentRoom) {
-                if (currentRoom.status === ROOM_WAITING) {
+                if (currentRoom.status === ROOM_STARTING) {
+                    navigate(generatePath(paths.playground, { id: currentRoom.id }), { replace: true });
+                } else if (currentRoom.status === ROOM_WAITING) {
                     navigate(generatePath(paths.room, { id: currentRoom.id }), { replace: true });
                 }
             }
