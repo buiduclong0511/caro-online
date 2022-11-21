@@ -8,3 +8,6 @@ export const FRIENDS_PATH = 'friends';
 
 // Local storage keys
 export const USER_KEY = 'user';
+
+// Room status
+export const ROOM_WAITING = 'waiting';

@@ -1,17 +1,16 @@
 import { useDispatch } from 'react-redux';
-import { generatePath, useNavigate } from 'react-router-dom';
+
+import { roomApi } from '~/api';
 import { Button, Sidebar } from '~/components';
 import RoomList from '~/components/RoomList';
 import Tabs from '~/components/Tabs';
 import Tab from '~/components/Tabs/Tab';
 import { signOut } from '~/firebase/authentication';
-import { clearUser, createRoom } from '~/redux/slices';
-import { paths } from '~/routes';
+import { clearUser } from '~/redux/slices';
 import { cx } from '~/util';
 
 function Home() {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const handleSignOut = () => {
         dispatch(clearUser());
@@ -19,7 +18,7 @@ function Home() {
     };
 
     const handleCreateRoom = () => {
-        dispatch(createRoom()).then((res) => navigate(generatePath(paths.room, { id: res.payload })));
+        roomApi.create();
     };
 
     return (
