@@ -1,11 +1,12 @@
 import { cx } from '~/util';
 
-function Avatar({ src, className = '', size = 40, ...props }) {
+function Avatar({ src = '', alt = '', className = '', size = 40, ...props }) {
     return (
         <img
-            src={src ? src : '/images/fallbackavt.jpg'}
-            alt="avatar"
-            className={cx(`w-[${size}px] h-[${size}px] object-cover rounded-full`, className)}
+            style={{ width: `${size}px`, height: `${size}px` }}
+            src={src || '/images/fallbackavt.jpg'}
+            alt={alt}
+            className={cx(`object-cover rounded-full`, className)}
         />
     );
 }

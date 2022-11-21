@@ -84,6 +84,9 @@ function ListenDbFirebase() {
                     online: !!userData.online,
                     exp: userData.exp || 0,
                     level: userData.level || 1,
+                    win: userData.win || 0,
+                    lose: userData.lose || 0,
+                    draw: userData.draw || 0,
                 }));
             }
 
