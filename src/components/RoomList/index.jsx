@@ -5,9 +5,9 @@ function RoomList({ ...props }) {
         <table className={cx('w-full mt-[20px]')}>
             <thead>
                 <tr>
-                    <th className={cx('pb-[8px]')}>STT</th>
+                    <th className={cx('pb-[8px]')}>#</th>
                     <th className={cx('pb-[8px]')}>Id</th>
-                    <th className={cx('pb-[8px]')}>Chủ phòng</th>
+                    <th className={cx('pb-[8px]')}>Master</th>
                 </tr>
             </thead>
             <tbody>

@@ -24,7 +24,7 @@ function UserInfo({ data, isMaster = false }) {
                             'absolute top-[-8px] left-[-8px] bg-white p-[4px] rounded-full shadow-lg border border-gray-100',
                         )}
                     >
-                        <img className={cx('w-[15px] rotate-[-30deg]')} src="/images/crown_icon.svg" alt="crown" />
+                        <img className={cx('w-[15px]')} src="/images/crown_icon.svg" alt="crown" />
                     </div>
                 )}
             </div>

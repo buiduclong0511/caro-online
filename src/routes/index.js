@@ -1,26 +1,28 @@
-import { Home, Login, Room } from '~/pages';
+import { Home, Login, Playground, Room } from '~/pages';
 
 export const paths = {
     home: '/',
     login: '/login',
     room: '/room/:id',
+    playground: '/playground/:id',
 };
 
 const routes = [
     {
         path: paths.home,
         element: Home,
-        isPrivate: true,
     },
     {
         path: paths.login,
         element: Login,
-        isPrivate: false,
     },
     {
         path: paths.room,
         element: Room,
-        isPrivate: false,
+    },
+    {
+        path: paths.playground,
+        element: Playground,
     },
 ];
 
