@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { ROOMS_PATH, ROOM_READY, ROOM_STARTING } from '~/constants';
 import db from '~/firebase/realtimeDatabase';
 import store from '~/redux';
+import playgroundApi from './playgroundApi';
 
 const roomApi = {
     async create() {
@@ -65,6 +66,7 @@ const roomApi = {
             const currentRoom = rooms.find((room) => room.masterUid === uid);
             if (currentRoom && currentRoom.status === ROOM_READY) {
                 await db.update(`${ROOMS_PATH}/${currentRoom.id}/status`, ROOM_STARTING);
+                await playgroundApi.create();
                 return true;
             }
             return true;

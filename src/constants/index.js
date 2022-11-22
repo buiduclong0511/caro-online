@@ -5,6 +5,7 @@ export const ENTER_KEY = 13;
 export const ROOMS_PATH = 'rooms';
 export const USERS_PATH = 'users';
 export const FRIENDS_PATH = 'friends';
+export const PLAYGROUNDS_PATH = 'playgrounds';
 
 // Local storage keys
 export const USER_KEY = 'user';
