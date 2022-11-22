@@ -1,12 +1,20 @@
+import { useEffect, useState } from 'react';
 import { cx } from '~/util';
 
-function Avatar({ src = '', alt = '', className = '', size = 40, ...props }) {
+function Avatar({ src = '', alt = '', fallback = '/images/fallbackavt.jpg', className = '', size = 40, ...props }) {
+    const [_src, setSrc] = useState(null);
+
+    useEffect(() => {
+        setSrc(src || fallback);
+    }, [fallback, src]);
+
     return (
         <img
             style={{ width: `${size}px`, height: `${size}px` }}
-            src={src || '/images/fallbackavt.jpg'}
+            src={_src}
             alt={alt}
             className={cx(`object-cover rounded-full`, className)}
+            onError={() => setSrc(fallback)}
         />
     );
 }

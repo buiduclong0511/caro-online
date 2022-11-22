@@ -37,7 +37,7 @@ function Room() {
                         'absolute top-[10px] bg-white shadow-lg w-[300px] rounded-[8px] flex flex-col gap-[16px] items-center justify-between px-[16px] py-[16px]',
                     )}
                 >
-                    <p className={cx('w-full text-center')}>{currentRoom.status}</p>
+                    <p className={cx('w-full text-center uppercase')}>{currentRoom.status}</p>
                     <div className={cx(`flex justify-around w-full`)}>
                         <button
                             className={cx('bg-red-500 text-white py-[4px] px-[16px] rounded-[4px] shadow-lg')}
