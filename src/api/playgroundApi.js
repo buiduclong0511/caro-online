@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import { PLAYGROUNDS_PATH } from '~/constants';
+import { PLAYGROUNDS_PATH, USERS_PATH } from '~/constants';
 import db from '~/firebase/realtimeDatabase';
 import store from '~/redux';
 
@@ -28,6 +28,9 @@ const playgroundApi = {
                 },
                 lastPosition: [],
             });
+
+            db.update(`${USERS_PATH}/${currentRoom.members[0]}/isPlaying`, true);
+            db.update(`${USERS_PATH}/${currentRoom.members[1]}/isPlaying`, true);
 
             return true;
         } catch (err) {

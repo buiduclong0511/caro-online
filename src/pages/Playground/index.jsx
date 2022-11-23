@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { playgroundApi } from '~/api';
+import { historyApi, playgroundApi, userApi } from '~/api';
 import { Block } from '~/components';
 import { PLAYGROUNDS_PATH } from '~/constants';
 import db from '~/firebase/realtimeDatabase';
-import { board, cx } from '~/util';
+import { board, check, cx } from '~/util';
 import UserInfo from './UserInfo';
 
 function Playground() {
@@ -16,9 +16,11 @@ function Playground() {
     const [playground, setPlayground] = useState(null);
     const [loading, setLoading] = useState(false);
     const [selectedPosition, setSelectedPosition] = useState([]);
+    const [winPositions, setWinPositions] = useState([]);
 
     const isListened = useRef(false);
     const isMyTurn = useRef(false);
+    const isBlocked = useRef(false);
 
     const tickedPositions = useMemo(() => {
         if (!playground || !playground.board) {
@@ -44,7 +46,7 @@ function Playground() {
 
     const handleTick = useCallback(
         (position) => {
-            if (isMyTurn.current) {
+            if (isMyTurn.current && !isBlocked.current) {
                 setSelectedPosition([]);
                 playgroundApi.tick(myLabel, position);
             }
@@ -53,7 +55,9 @@ function Playground() {
     );
 
     const handleSelected = useCallback((position) => {
-        setSelectedPosition(position);
+        if (!isBlocked.current) {
+            setSelectedPosition(position);
+        }
     }, []);
 
     useEffect(() => {
@@ -77,6 +81,53 @@ function Playground() {
             }
         }
     }, [currentUser, rooms]);
+
+    useEffect(() => {
+        if (playground) {
+            if (playground.lastPosition) {
+                const xPositions = playground?.board?.x
+                    ? Object.values(playground.board.x).map((position) => [
+                          Number(position.split(',')[0]),
+                          Number(position.split(',')[1]),
+                      ])
+                    : [];
+
+                const oPositions = playground?.board?.o
+                    ? Object.values(playground.board.o).map((position) => [
+                          Number(position.split(',')[0]),
+                          Number(position.split(',')[1]),
+                      ])
+                    : [];
+                const checkedResult = check(xPositions, oPositions, playground.lastPosition);
+                console.log('checkedResult', checkedResult);
+                if (checkedResult.result) {
+                    setWinPositions(checkedResult.points);
+                    isBlocked.current = true;
+                    const currentRoom = rooms.find(
+                        (room) => room.members.includes(currentUser?.uid) || room.audiences.includes(currentUser?.uid),
+                    );
+                    if (currentRoom) {
+                        const winner = Object.keys(playground.labels).find(
+                            (uid) => playground.labels[uid] === checkedResult.label,
+                        );
+                        historyApi.create({
+                            roomId: currentRoom.id,
+                            members: currentRoom.members.reduce(
+                                (prev, curr) => ({
+                                    ...prev,
+                                    [curr]: curr,
+                                }),
+                                {},
+                            ),
+                            winner,
+                        });
+
+                        userApi.updateStats(winner === currentUser.uid ? 'win' : 'lose');
+                    }
+                }
+            }
+        }
+    }, [currentUser?.uid, playground, rooms]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -131,13 +182,17 @@ function Playground() {
             {board.map((row, index) => (
                 <div key={`row-${index}`} className={cx(`flex flex-nowrap`)}>
                     {row.map((cell, _index) => {
-                        let selected = selectedPosition[0] === index && selectedPosition[1] === _index;
+                        const selected = selectedPosition[0] === index && selectedPosition[1] === _index;
+                        const isWinPosition = winPositions.some(
+                            (position) => position[0] === index && position[1] === _index,
+                        );
                         return (
                             <Block
                                 key={`cell-${_index}`}
                                 x={index}
                                 y={_index}
                                 selected={selected}
+                                isWinPosition={isWinPosition}
                                 onSelect={handleSelected}
                                 onTick={handleTick}
                             >
