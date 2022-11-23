@@ -34,7 +34,7 @@ export const signUpWithEmail = (email, password) => {
                     exp: 0,
                     win: 0,
                     lose: 0,
-                    draw: 0,
+                    isPlaying: false,
                 }).then(() => {
                     res(user);
                 });
@@ -56,11 +56,11 @@ export const signInWithGoogle = () => {
                     photoURL: user.photoURL,
                     scores: 0,
                     online: false,
-                    level: 0,
+                    level: 1,
                     exp: 0,
                     win: 0,
                     lose: 0,
-                    draw: 0,
+                    isPlaying: false,
                 }).then(() => {
                     res(user);
                 });

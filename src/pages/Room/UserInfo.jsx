@@ -33,8 +33,7 @@ function UserInfo({ data, isMaster = false }) {
                 <p className={cx('')}>Scores: {data.scores}</p>
                 <p className={cx('')}>
                     <span className={cx('text-green-500')}>{data.win}</span>/
-                    <span className={cx('text-red-500')}>{data.lose}</span>/
-                    <span className={cx('text-gray-500')}>{data.draw}</span>
+                    <span className={cx('text-red-500')}>{data.lose}</span>
                 </p>
             </div>
         </div>

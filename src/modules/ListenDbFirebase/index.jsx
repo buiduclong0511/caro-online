@@ -86,7 +86,7 @@ function ListenDbFirebase() {
                     level: userData.level || 1,
                     win: userData.win || 0,
                     lose: userData.lose || 0,
-                    draw: userData.draw || 0,
+                    isPlaying: !!userData.isPlaying,
                 }));
             }
 
