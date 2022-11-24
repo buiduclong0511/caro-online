@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { historyApi, playgroundApi, userApi } from '~/api';
-import { Block } from '~/components';
+import { historyApi, playgroundApi, roomApi, userApi } from '~/api';
+import { Block, Button } from '~/components';
 import { PLAYGROUNDS_PATH } from '~/constants';
 import db from '~/firebase/realtimeDatabase';
 import { board, check, cx } from '~/util';
+import Dialog from './Dialog';
 import UserInfo from './UserInfo';
 
 function Playground() {
@@ -17,10 +18,13 @@ function Playground() {
     const [loading, setLoading] = useState(false);
     const [selectedPosition, setSelectedPosition] = useState([]);
     const [winPositions, setWinPositions] = useState([]);
+    const [ended, setEnded] = useState(false);
 
     const isListened = useRef(false);
     const isMyTurn = useRef(false);
     const isBlocked = useRef(false);
+    const isWin = useRef(false);
+    const screen = useRef(null);
 
     const tickedPositions = useMemo(() => {
         if (!playground || !playground.board) {
@@ -59,6 +63,11 @@ function Playground() {
             setSelectedPosition(position);
         }
     }, []);
+
+    const handleClose = async () => {
+        await playgroundApi.delete(currentRoom.id);
+        await roomApi.delete(currentRoom.id);
+    };
 
     useEffect(() => {
         setLoading(true);
@@ -99,7 +108,6 @@ function Playground() {
                       ])
                     : [];
                 const checkedResult = check(xPositions, oPositions, playground.lastPosition);
-                console.log('checkedResult', checkedResult);
                 if (checkedResult.result) {
                     setWinPositions(checkedResult.points);
                     isBlocked.current = true;
@@ -122,12 +130,27 @@ function Playground() {
                             winner,
                         });
 
-                        userApi.updateStats(winner === currentUser.uid ? 'win' : 'lose');
+                        setEnded(true);
+                        isWin.current = winner === currentUser.uid;
+                        userApi.updateStats(isWin.current ? 'win' : 'lose');
                     }
                 }
             }
         }
     }, [currentUser?.uid, playground, rooms]);
+
+    useEffect(() => {
+        if (!loading) {
+            setTimeout(() => {
+                if (screen.current) {
+                    screen.current.scrollTo(
+                        screen.current.scrollWidth / 2 - screen.current.offsetWidth / 2,
+                        screen.current.scrollHeight / 2 - screen.current.offsetHeight / 2,
+                    );
+                }
+            }, 0);
+        }
+    }, [loading]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -148,60 +171,83 @@ function Playground() {
     const members = currentRoom.members.map((uid) => users.find((user) => user.uid === uid));
 
     return (
-        <div>
-            {!!members[0] && (
-                <div className={cx('fixed top-[4px] left-[4px]')}>
-                    <span
-                        className={cx(
-                            'absolute top-[4px] right-[4px] bg-white flex w-[18px] h-[18px] rounded-full justify-center items-center shadow-lg',
-                            {
-                                'text-red-500': playground.labels[members[0].uid] === 'x',
-                            },
-                        )}
-                    >
-                        {playground.labels[members[0].uid]}
-                    </span>
-                    <UserInfo data={members[0]} active={playground.labels[members[0].uid] === playground.currentTurn} />
+        <div className={cx('flex flex-col w-screen h-screen')}>
+            <div
+                className={cx(
+                    'h-[100px] relative border-b border-b-gray-400 flex justify-between items-center bg-gray-100 px-[16px]',
+                )}
+            >
+                {!!members[0] && (
+                    <div className={cx('relative')}>
+                        <span
+                            className={cx(
+                                'absolute top-[4px] right-[4px] bg-white flex w-[18px] h-[18px] rounded-full justify-center items-center shadow-lg',
+                                {
+                                    'text-red-500': playground.labels[members[0].uid] === 'x',
+                                },
+                            )}
+                        >
+                            {playground.labels[members[0].uid]}
+                        </span>
+                        <UserInfo
+                            data={members[0]}
+                            active={playground.labels[members[0].uid] === playground.currentTurn}
+                        />
+                    </div>
+                )}
+
+                <div className={cx('flex flex-col justify-center gap-[8px] h-full')}>
+                    <div className={cx('h-[20px] flex justify-center items-center')}>
+                        {isMyTurn.current ? 'Your turn!' : ''}
+                    </div>
+                    <Button className={cx('bg-red-500 text-white')}>Give up</Button>
                 </div>
-            )}
-            {!!members[1] && (
-                <div className={cx('fixed top-[4px] right-[4px]')}>
-                    <span
-                        className={cx(
-                            'absolute top-[4px] left-[4px] bg-white flex w-[18px] h-[18px] rounded-full justify-center items-center shadow-lg',
-                            {
-                                'text-blue-500': playground.labels[members[1].uid] === 'o',
-                            },
-                        )}
-                    >
-                        {playground.labels[members[1].uid]}
-                    </span>
-                    <UserInfo data={members[1]} active={playground.labels[members[1].uid] === playground.currentTurn} />
-                </div>
-            )}
-            {board.map((row, index) => (
-                <div key={`row-${index}`} className={cx(`flex flex-nowrap`)}>
-                    {row.map((cell, _index) => {
-                        const selected = selectedPosition[0] === index && selectedPosition[1] === _index;
-                        const isWinPosition = winPositions.some(
-                            (position) => position[0] === index && position[1] === _index,
-                        );
-                        return (
-                            <Block
-                                key={`cell-${_index}`}
-                                x={index}
-                                y={_index}
-                                selected={selected}
-                                isWinPosition={isWinPosition}
-                                onSelect={handleSelected}
-                                onTick={handleTick}
-                            >
-                                {tickedPositions[`${index},${_index}`]}
-                            </Block>
-                        );
-                    })}
-                </div>
-            ))}
+
+                {!!members[1] && (
+                    <div className={cx('relative')}>
+                        <span
+                            className={cx(
+                                'absolute top-[4px] left-[4px] bg-white flex w-[18px] h-[18px] rounded-full justify-center items-center shadow-lg',
+                                {
+                                    'text-blue-500': playground.labels[members[1].uid] === 'o',
+                                },
+                            )}
+                        >
+                            {playground.labels[members[1].uid]}
+                        </span>
+                        <UserInfo
+                            data={members[1]}
+                            active={playground.labels[members[1].uid] === playground.currentTurn}
+                        />
+                    </div>
+                )}
+            </div>
+            <div className={cx('flex-1 overflow-auto')} ref={screen}>
+                {board.map((row, index) => (
+                    <div key={`row-${index}`} className={cx(`flex flex-nowrap`)}>
+                        {row.map((cell, _index) => {
+                            const selected = selectedPosition[0] === index && selectedPosition[1] === _index;
+                            const isWinPosition = winPositions.some(
+                                (position) => position[0] === index && position[1] === _index,
+                            );
+                            return (
+                                <Block
+                                    key={`cell-${_index}`}
+                                    x={index}
+                                    y={_index}
+                                    selected={selected}
+                                    isWinPosition={isWinPosition}
+                                    onSelect={handleSelected}
+                                    onTick={handleTick}
+                                >
+                                    {tickedPositions[`${index},${_index}`]}
+                                </Block>
+                            );
+                        })}
+                    </div>
+                ))}
+            </div>
+            {ended && <Dialog text={isWin.current ? 'Winner' : 'Loser'} onClick={handleClose} />}
         </div>
     );
 }

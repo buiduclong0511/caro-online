@@ -108,6 +108,15 @@ const roomApi = {
             return err;
         }
     },
+    async delete(id) {
+        try {
+            await db.remove(`${ROOMS_PATH}/${id}`);
+
+            return true;
+        } catch (err) {
+            return err;
+        }
+    },
 };
 
 export default roomApi;

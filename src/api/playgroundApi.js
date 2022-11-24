@@ -60,6 +60,15 @@ const playgroundApi = {
             return err;
         }
     },
+    async delete(id) {
+        try {
+            await db.remove(`${PLAYGROUNDS_PATH}/${id}`);
+
+            return true;
+        } catch (err) {
+            return err;
+        }
+    },
 };
 
 export default playgroundApi;
